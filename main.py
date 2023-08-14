@@ -1,28 +1,13 @@
-import spotipy
-from dotenv import dotenv_values
-from spotipy.oauth2 import SpotifyClientCredentials
-import json
+from logic.get_all_playlist import get_all_playlist
+from logic.session_creator import create_session
+from logic.show_selected_playlist import show_selected_playlist
 
-env = dotenv_values("./config/.env")
+def main():
+    session = create_session()
 
-CLIENT_ID = env["CLIENT_ID"]
-CLIENT_SECRET = env["CLIENT_SECRET"]
+    playlists = get_all_playlist(session)
 
-client_credentials_manager = SpotifyClientCredentials(
-    client_id=CLIENT_ID, client_secret=CLIENT_SECRET
-)
+    show_selected_playlist(session, playlists=playlists)
 
-session = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-
-playlists = session.user_playlists("ladziholmsz", limit=50, offset=0)
-
-for playlist in playlists["items"]:
-    print(playlist["name"])
-
-
-num = int(input("Adj meg egy playlist indexet: "))
-print("A választott playlist elemei:")
-elements = session.playlist(playlist_id=playlists["items"][num]["id"], fields="tracks(items(track(name)))")
-
-for element in elements["tracks"]["items"]:
-    print(element["track"]["name"])
+if __name__ == "__main__":
+    main()
